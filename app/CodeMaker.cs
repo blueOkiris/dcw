@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.Linq;
 
 namespace dcw
 {
@@ -26,6 +27,10 @@ namespace dcw
         );
         private static Regex _defineRegex = new Regex(
             @"#define\s*.+\n",
+            RegexOptions.Compiled
+        );
+        private static Regex _importRegex = new Regex(
+            @"import\s*\(\s*[A-Za-z0-9_]+\s*\)",
             RegexOptions.Compiled
         );
 
@@ -53,47 +58,90 @@ namespace dcw
             foreach(Module module in modules)
             {
                 Console.WriteLine(module.ToString());
-                
-                // Recreate source code
-                StringBuilder newCCode = new StringBuilder();
-
-                // Start header with include guard
-                StringBuilder newHeaderCode = new StringBuilder("#ifndef _");
-                newHeaderCode.Append(Path.GetFileNameWithoutExtension(module.Source).ToUpper());
-                newHeaderCode.Append("_H_\n#define _");
-                newHeaderCode.Append(Path.GetFileNameWithoutExtension(module.Source).ToUpper());
-                newHeaderCode.Append("_H_\n#endif\n\n");
-                
-                // Replace all import statements
-                // If it's not in our list of sources, then simply convert to #include <...>
-                // If it is in our list of sources, then convert it to #include <headers/...>
-                foreach(string import in module.Imports)
-                {
-                    newCCode.Append("#include <");
-                    newCCode.Append(import);
-                    newCCode.Append(".h>\n");
-                }
 
                 // Get all the different "things" in the code
                 string code = File.ReadAllText(module.Source);
 
-                MatchCollection functions = _functionRegex.Matches(code);
-                List<FunctionDefinition> funcDefs = new List<FunctionDefinition>();
+                // Have to remove others so functions can be parsed
+                FunctionDefinition[] funcDefs = parseFunctions(code, module.Name);
 
-                Console.WriteLine(functions.Count + " functions in " + module.Name + ":");
-                foreach(Match func in functions)
-                {
-                    Console.WriteLine(func.Value);
-                    funcDefs.Add(new FunctionDefinition(func.Value));
-                    Console.WriteLine(funcDefs[funcDefs.Count - 1].ToString());
-                }
-
-                // Save the new files
-                if(module.Exports.Length > 0)
-                    File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());
-
-                File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
+                saveNewHeader(module, funcDefs);
+                saveNewCCode(module, code);
             }
+        }
+
+        private static void saveNewCCode(Module module, string sourceCode)
+        {
+            // Recreate source code
+            StringBuilder newCCode = new StringBuilder();
+            string code = sourceCode;
+            
+            // Replace all import statements
+            // If it's not in our list of sources, then simply convert to #include <...>
+            // If it is in our list of sources, then convert it to #include <headers/...>
+            MatchCollection importStmts = _importRegex.Matches(code);
+            foreach(Match importStmt in importStmts)
+                code = code.Replace(importStmt.Value, "");
+            foreach(string import in module.Imports)
+            {
+                newCCode.Append("#include <");
+                newCCode.Append(import);
+                newCCode.Append(".h>\n\n");
+            }
+            
+            newCCode.Append(code);
+
+            File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
+        }
+
+        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs)
+        {
+            if(module.Exports.Length < 1)
+                return;
+
+            // Start header with include guard
+            StringBuilder newHeaderCode = new StringBuilder("#ifndef _");
+            newHeaderCode.Append(Path.GetFileNameWithoutExtension(module.Source).ToUpper());
+            newHeaderCode.Append("_H_\n#define _");
+            newHeaderCode.Append(Path.GetFileNameWithoutExtension(module.Source).ToUpper());
+            newHeaderCode.Append("_H_\n#endif\n\n");
+
+            // Save the function headers to header
+            foreach(FunctionDefinition func in funcDefs)
+            {
+                StringBuilder funcHeader = new StringBuilder();
+
+                funcHeader.Append(func.ReturnType);
+                funcHeader.Append(' ');
+                funcHeader.Append(func.Name);
+                funcHeader.Append("(");
+                func.Parameters.ToList().ForEach(tup => funcHeader.Append(tup.Item1).Append(' ').Append(tup.Item2).Append(", "));
+                funcHeader.Remove(funcHeader.Length - 2, 2);
+                funcHeader.Append(");");
+
+                newHeaderCode.Append(funcHeader);
+                newHeaderCode.Append("\n");
+            }
+            newHeaderCode.Append("\n");
+
+            File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());
+        }
+
+        private static FunctionDefinition[] parseFunctions(string code, string name)
+        {
+            MatchCollection functions = _functionRegex.Matches(code);
+            List<FunctionDefinition> funcDefs = new List<FunctionDefinition>();
+
+            Console.WriteLine(functions.Count + " functions in " + name + ":");
+            foreach(Match func in functions)
+            {
+                // Parse the functions
+                Console.WriteLine(func.Value);
+                funcDefs.Add(new FunctionDefinition(func.Value));
+                Console.WriteLine(funcDefs[funcDefs.Count - 1].ToString());
+            }
+
+            return funcDefs.ToArray();
         }
     }
 }

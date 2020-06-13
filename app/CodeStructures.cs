@@ -155,7 +155,9 @@ namespace dcw
             ReturnType = new string(fType.ToString().Reverse().ToArray());
 
             List<(string, string)> parameters = new List<(string, string)>();
-            MatchCollection parameterMatches = _paramRegex.Matches(sourceCode.Substring(sourceCode.IndexOf('(')));
+            int end = sourceCode.IndexOf('{');
+            int begin = sourceCode.IndexOf('(');
+            MatchCollection parameterMatches = _paramRegex.Matches(sourceCode.Substring(begin, end - begin));
             foreach(Match param in parameterMatches)
             {
                 StringBuilder parName = new StringBuilder();

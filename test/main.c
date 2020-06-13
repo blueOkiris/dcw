@@ -5,7 +5,7 @@ import(stdio)
 
 int main(int argc, char **args) {
     // Test functions
-    lib_print();
+    lib_print("Hello", "world");
 
     // Test structs and typedefs
     struct lib_struct_s strct1;
