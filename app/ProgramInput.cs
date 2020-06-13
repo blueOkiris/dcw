@@ -40,52 +40,52 @@ namespace dcw
     // Doesn't need to be, but I thought it'd be fun
     class ArgumentProcessor
     {
-        private static ArgumentProcessor instance = null;
-        private string[] arguments;
+        private static ArgumentProcessor _instance = null;
+        private string[] _arguments;
 
         private ArgumentProcessor() {}
 
         public static ArgumentProcessor GetInstance()
         {
-            if(instance == null) 
-                instance = new ArgumentProcessor();
+            if(_instance == null) 
+                _instance = new ArgumentProcessor();
 
-            return instance;
+            return _instance;
         }
 
         public void SetArguments(string[] arguments)
         {
-            this.arguments = arguments;
+            _arguments = arguments;
         }
 
         public WrapRequest GetRequest()
         {
-            if(arguments.Length < 3)
+            if(_arguments.Length < 3)
             {
                 Console.WriteLine(ErrorCodes.Strings[ErrorCodes.Codes.NOT_ENOUGH_ARGS]);
                 Environment.Exit((int) ErrorCodes.Codes.NOT_ENOUGH_ARGS);
             }
 
             // The three parts of the request
-            string compiler = arguments[1];
+            string compiler = _arguments[1];
             List<string> sourceFiles = new List<string>();
             StringBuilder passThroughOptions = new StringBuilder();
 
             // Get source files
             int i = 1;
-            while(arguments[i] != "-cf")
+            while(_arguments[i] != "-cf")
             {
                 //Console.WriteLine(arguments[i]);
-                sourceFiles.Add(arguments[i++]);
+                sourceFiles.Add(_arguments[i++]);
 
-                if(i >= arguments.Length)
+                if(i >= _arguments.Length)
                     break;
             }
 
             i++;
-            while(i < arguments.Length)
+            while(i < _arguments.Length)
             {
-                passThroughOptions.Append(arguments[i++]);
+                passThroughOptions.Append(_arguments[i++]);
                 passThroughOptions.Append(' ');
             }
 
@@ -97,7 +97,7 @@ namespace dcw
             StringBuilder argProcessorStr = new StringBuilder();
 
             argProcessorStr.Append("Arguments: { ");
-            arguments.ToList().ForEach(arg => argProcessorStr.Append(arg).Append(", "));
+            _arguments.ToList().ForEach(arg => argProcessorStr.Append(arg).Append(", "));
             argProcessorStr.Remove(argProcessorStr.Length - 2, 1);
             argProcessorStr.Append("}");
 
