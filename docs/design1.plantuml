@@ -10,7 +10,6 @@ class Main {
 class Module {
     - name : string
     - imports : string[]
-    - defineModule : string
 
     + createFromFile(fileName : string) : Module
 }
@@ -28,8 +27,6 @@ class ArgumentProcessor {
     + getRequest() : WrapRequest
 }
 
-note top of Module : defineModule replaces module() macro in c code using defines
-
 class NewCodeMaker {
     - getModules(fileNames : string[]) : Module[]
     + generateNewCode(request : WrapRequest)
@@ -40,16 +37,18 @@ class ObjectBuilder {
 }
 
 Main --d-> ArgumentProcessor
-ArgumentProcessor ..> WrapRequest
+Main ---> ObjectBuilder
 Main --d-> WrapRequest
-Main -u-> SourceFiles
-SourceFiles -[hidden]> NewCodeFiles
-Main -d-> NewCodeMaker
+Main --l-> NewCodeMaker
+
+ArgumentProcessor ..> WrapRequest
+
+NewCodeMaker -u-> SourceFiles
 NewCodeMaker .l.> "*" Module
 NewCodeMaker ..> NewCodeFiles
-Main ---> NewCodeFiles
 NewCodeMaker --> WrapRequest
+
 ObjectBuilder --> WrapRequest
-Main ---> ObjectBuilder
+ObjectBuilder --> NewCodeFiles
 
 @enduml
