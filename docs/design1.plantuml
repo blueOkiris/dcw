@@ -1,0 +1,37 @@
+@startuml design1
+
+class SourceFiles
+class HeaderFiles
+
+class Main {
+    - fileNames : char **
+    - fileCount : int
+
+    + main()
+    - build()
+}
+
+class Module {
+    - name : char *
+    - imports : char **
+    - defineModule : char *
+
+    + createFromFile(fileName : char *) : Module *
+    + freeModule(module : Module *)
+}
+
+note top of Module : defineModule replaces module() macro using defines
+
+class HeaderMaker {
+    - getModules(fileNames : char **, count : int) : Module **
+    + generateHeadersAndDefs(fileNames : char **, count : int)
+}
+
+Main -d-> SourceFiles
+SourceFiles -[hidden]> HeaderFiles
+Main -d-> HeaderMaker
+HeaderMaker .r.> "*" Module
+HeaderMaker ..> HeaderFiles
+Main --> HeaderFiles
+
+@enduml
