@@ -9,10 +9,14 @@ namespace dcw
     {
         static void Main(string[] args)
         {
-            ArgCompiler argCompiler = ArgCompiler.GetInstance();
+            ArgumentProcessor argCompiler = ArgumentProcessor.GetInstance();
             argCompiler.SetArguments(args);
+            Console.WriteLine(argCompiler.ToString());
+
             WrapRequest wrapRequest = argCompiler.GetRequest();
             Console.WriteLine("Application Wrap Request: {0}", wrapRequest.ToString());
+            
+            NewCodeMaker.GenerateNewCode(wrapRequest);
         }
     }
 
@@ -49,17 +53,17 @@ namespace dcw
     // This is a class that sets up the arguments to be processed
     // It's a singleton. There should only be one.
     // Doesn't need to be, but I thought it'd be fun
-    class ArgCompiler
+    class ArgumentProcessor
     {
-        private static ArgCompiler instance = null;
+        private static ArgumentProcessor instance = null;
         private string[] arguments;
 
-        private ArgCompiler() {}
+        private ArgumentProcessor() {}
 
-        public static ArgCompiler GetInstance()
+        public static ArgumentProcessor GetInstance()
         {
             if(instance == null) 
-                instance = new ArgCompiler();
+                instance = new ArgumentProcessor();
 
             return instance;
         }
@@ -86,7 +90,7 @@ namespace dcw
             int i = 1;
             while(arguments[i] != "-cf")
             {
-                Console.WriteLine(arguments[i]);
+                //Console.WriteLine(arguments[i]);
                 sourceFiles.Add(arguments[i++]);
 
                 if(i >= arguments.Length)
@@ -101,6 +105,18 @@ namespace dcw
             }
 
             return new WrapRequest(compiler, sourceFiles.ToArray(), passThroughOptions.ToString());
+        }
+
+        public override string ToString()
+        {
+            StringBuilder argProcessorStr = new StringBuilder();
+
+            argProcessorStr.Append("Arguments: { ");
+            arguments.ToList().ForEach(arg => argProcessorStr.Append(arg).Append(", "));
+            argProcessorStr.Remove(argProcessorStr.Length - 2, 1);
+            argProcessorStr.Append("}");
+
+            return argProcessorStr.ToString();
         }
     }
 }
