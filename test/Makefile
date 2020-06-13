@@ -16,3 +16,6 @@ LDFLAGS=
 $(OBJNAME) : $(SRC) ../app/dcw
 	../app/dcw $(CC) $(SRC) -cf $(CFLAGS)
 	$(CC) $(addprefix -L,$(LIBFLDRS)) $(wildcard obj/*.o) $(LDFLAGS)
+
+../app/dcw :
+	cd ../app; make
