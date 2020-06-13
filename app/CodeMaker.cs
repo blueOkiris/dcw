@@ -123,6 +123,7 @@ namespace dcw
         {
             List<Module> moduleList = new List<Module>();
 
+            Console.WriteLine("Loading modules:");
             foreach(string fileName in fileNames)
                 moduleList.Add(new Module(fileName));
 
