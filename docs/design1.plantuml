@@ -1,37 +1,55 @@
 @startuml design1
 
 class SourceFiles
-class HeaderFiles
+class NewCodeFiles
 
 class Main {
-    - fileNames : char **
-    - fileCount : int
-
     + main()
-    - build()
 }
 
 class Module {
-    - name : char *
-    - imports : char **
-    - defineModule : char *
+    - name : string
+    - imports : string[]
+    - defineModule : string
 
-    + createFromFile(fileName : char *) : Module *
-    + freeModule(module : Module *)
+    + createFromFile(fileName : string) : Module
 }
 
-note top of Module : defineModule replaces module() macro using defines
-
-class HeaderMaker {
-    - getModules(fileNames : char **, count : int) : Module **
-    + generateHeadersAndDefs(fileNames : char **, count : int)
+class WrapRequest {
+    + compiler : string
+    + files : string[]
+    + extraOptions : string
 }
 
-Main -d-> SourceFiles
-SourceFiles -[hidden]> HeaderFiles
-Main -d-> HeaderMaker
-HeaderMaker .r.> "*" Module
-HeaderMaker ..> HeaderFiles
-Main --> HeaderFiles
+class ArgumentProcessor {
+    - {static} instance : ArgumentProcessor
+    - ArgumentProcessor()
+    + {static} getInstance() : ArgumentProcessor
+    + getRequest() : WrapRequest
+}
+
+note top of Module : defineModule replaces module() macro in c code using defines
+
+class NewCodeMaker {
+    - getModules(fileNames : string[]) : Module[]
+    + generateNewCode(request : WrapRequest)
+}
+
+class ObjectBuilder {
+    + {static} build(request : WrapRequest)
+}
+
+Main --d-> ArgumentProcessor
+ArgumentProcessor ..> WrapRequest
+Main --d-> WrapRequest
+Main -u-> SourceFiles
+SourceFiles -[hidden]> NewCodeFiles
+Main -d-> NewCodeMaker
+NewCodeMaker .l.> "*" Module
+NewCodeMaker ..> NewCodeFiles
+Main ---> NewCodeFiles
+NewCodeMaker --> WrapRequest
+ObjectBuilder --> WrapRequest
+Main ---> ObjectBuilder
 
 @enduml
