@@ -9,6 +9,10 @@ namespace dcw
 {
     class NewCodeMaker
     {
+        private static Regex _moduleDef = new Regex(
+            @"module\s*\(\s*[A-Za-z0-9_]+\s*(,\s*[A-Za-z0-9_]+\s*)*\s*\)",
+            RegexOptions.Compiled
+        );
         private static Regex _importRegex = new Regex(
             @"import\s*\(\s*[A-Za-z0-9_]+\s*\)",
             RegexOptions.Compiled
@@ -64,6 +68,10 @@ namespace dcw
             // Recreate source code
             StringBuilder newCCode = new StringBuilder();
             string code = sourceCode;
+
+            // Remove module lines
+            Match moduleLine = _moduleDef.Match(code);
+            code = code.Replace(moduleLine.Value, "");
             
             // Replace all import statements
             // If it's not in our list of sources, then simply convert to #include <...>
