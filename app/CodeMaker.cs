@@ -56,14 +56,13 @@ namespace dcw
                     code = code.Replace(comment.Value, "");
 
                 FunctionDefinition[] funcDefs = Parser.parseFunctions(code, module.Name);
-                string[] typedefDefs = Parser.parseTypedefs(code, module.Name);
 
-                saveNewHeader(module, funcDefs, typedefDefs);
-                saveNewCCode(module, code, typedefDefs);
+                saveNewHeader(module, funcDefs);
+                saveNewCCode(module, code);
             }
         }
 
-        private static void saveNewCCode(Module module, string sourceCode, string[] typedefDefs)
+        private static void saveNewCCode(Module module, string sourceCode)
         {
             // Recreate source code
             StringBuilder newCCode = new StringBuilder();
@@ -85,17 +84,13 @@ namespace dcw
                 newCCode.Append(import);
                 newCCode.Append(".h>\n\n");
             }
-
-            // Remove typedefs
-            foreach(string typedefStr in typedefDefs)
-                code = code.Replace(typedefStr, "");
             
             newCCode.Append(code);
 
             File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
         }
 
-        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs, string[] typedefDefs)
+        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs)
         {
             //if(module.Exports.Length < 1)
             //    return;
@@ -124,14 +119,6 @@ namespace dcw
                 funcHeader.Append(");");
 
                 newHeaderCode.Append(funcHeader);
-                newHeaderCode.Append("\n");
-            }
-            newHeaderCode.Append("\n");
-
-            // Add the typedefs
-            foreach(string typedefStr in typedefDefs)
-            {
-                newHeaderCode.Append(typedefStr);
                 newHeaderCode.Append("\n");
             }
             newHeaderCode.Append("\n");
