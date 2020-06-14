@@ -65,13 +65,11 @@ namespace dcw
             return funcDefs.ToArray();
         }
 
-        public static string[] parseTypedefs(string code, string name)
+        public static StructDefinition[] parseStructDefinitions(string code, string moduleName)
         {
-            List<string> typedefDefs = new List<string>();
+            List<StructDefinition> structDefs = new List<StructDefinition>();
 
-            
-            
-            return typedefDefs.ToArray();
+            return structDefs.ToArray();
         }
     }
 }

@@ -193,4 +193,30 @@ namespace dcw
             return funcStr.ToString();
         }
     }
+
+    struct StructDefinition
+    {
+        public string Name;
+        public string Source;
+
+        public StructDefinition(string source)
+        {
+            Source = source;
+            
+            StringBuilder name = new StringBuilder();
+            int i = 0;
+            while(char.IsLetterOrDigit(source[i]) || source[i] == '_')
+            {
+                name.Append(source[i]);
+                i++;
+            }
+
+            Name = name.ToString();
+        }
+
+        public override string ToString()
+        {
+            return "Struct { Name: " + Name + ", Source: " + Source + " }";
+        }
+    }
 }

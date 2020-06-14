@@ -56,6 +56,7 @@ namespace dcw
                     code = code.Replace(comment.Value, "");
 
                 FunctionDefinition[] funcDefs = Parser.parseFunctions(code, module.Name);
+                StructDefinition[] structDefs = Parser.parseStructs(code, module.Name);
 
                 saveNewHeader(module, funcDefs);
                 saveNewCCode(module, code);
