@@ -96,6 +96,7 @@ namespace dcw
             }
 
             Name = name;
+            imports.Add(name);
             Imports = imports.ToArray();
             Exports = exports.ToArray();
             Source = fileName;

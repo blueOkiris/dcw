@@ -9,28 +9,12 @@ namespace dcw
 {
     class NewCodeMaker
     {
-        private static Regex _functionRegex = new Regex(
-            @"[A-Za-z_]+[A-Za-z0-9_]*(\*|\s)+[A-Za-z_]+[A-Za-z0-9_]*\s*\(\s*([A-Za-z_]+[A-Za-z0-9_]*(\*|\s)+[A-Za-z_]+[A-Za-z0-9_]*(\s*,\s*[A-Za-z_]+[A-Za-z0-9_]*(\*|\s)+[A-Za-z_]+[A-Za-z0-9_]*\s*)*)?\s*\)\s*{",
-            RegexOptions.Compiled
-        );
-        private static Regex _structRegex = new Regex(
-            @"struct\s*[A-Za-z_]+[A-Za-z0-9_]*\s*{\s*(\s*.*;\s*)*\s*}\s*;",
-            RegexOptions.Compiled
-        );
-        private static Regex _typedefRegex = new Regex(
-            @"typedef\s*(\s*.\s*)*\s*[A-Za-z_]+[A-Za-z_0-9]*\s*;",
-            RegexOptions.Compiled
-        );
-        private static Regex _variableRegex = new Regex(
-            @"[A-Za-z_]+[A-Za-z0-9_]*\s*[A-Za-z_]+[A-Za-z0-9_]*(\s*=\s*.*)?(\s*,\s*[A-Za-z_]+[A-Za-z0-9_]*(\s*=\s*.*)?\s*)*;",
-            RegexOptions.Compiled
-        );
-        private static Regex _defineRegex = new Regex(
-            @"#define\s*.+\n",
-            RegexOptions.Compiled
-        );
         private static Regex _importRegex = new Regex(
             @"import\s*\(\s*[A-Za-z0-9_]+\s*\)",
+            RegexOptions.Compiled
+        );
+        private static Regex _lineCommentRegex = new Regex(
+            @"\/\/.*\n",
             RegexOptions.Compiled
         );
 
@@ -61,16 +45,21 @@ namespace dcw
 
                 // Get all the different "things" in the code
                 string code = File.ReadAllText(module.Source);
+                
+                // Remove comments
+                MatchCollection comments = _lineCommentRegex.Matches(code);
+                foreach(Match comment in comments)
+                    code = code.Replace(comment.Value, "");
 
-                // Have to remove others so functions can be parsed
-                FunctionDefinition[] funcDefs = parseFunctions(code, module.Name);
+                FunctionDefinition[] funcDefs = Parser.parseFunctions(code, module.Name);
+                string[] typedefDefs = Parser.parseTypedefs(code, module.Name);
 
-                saveNewHeader(module, funcDefs);
-                saveNewCCode(module, code);
+                saveNewHeader(module, funcDefs, typedefDefs);
+                saveNewCCode(module, code, typedefDefs);
             }
         }
 
-        private static void saveNewCCode(Module module, string sourceCode)
+        private static void saveNewCCode(Module module, string sourceCode, string[] typedefDefs)
         {
             // Recreate source code
             StringBuilder newCCode = new StringBuilder();
@@ -88,16 +77,20 @@ namespace dcw
                 newCCode.Append(import);
                 newCCode.Append(".h>\n\n");
             }
+
+            // Remove typedefs
+            foreach(string typedefStr in typedefDefs)
+                code = code.Replace(typedefStr, "");
             
             newCCode.Append(code);
 
             File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
         }
 
-        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs)
+        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs, string[] typedefDefs)
         {
-            if(module.Exports.Length < 1)
-                return;
+            //if(module.Exports.Length < 1)
+            //    return;
 
             // Start header with include guard
             StringBuilder newHeaderCode = new StringBuilder("#ifndef _");
@@ -109,6 +102,9 @@ namespace dcw
             // Save the function headers to header
             foreach(FunctionDefinition func in funcDefs)
             {
+                if(!module.Exports.Contains(func.Name))
+                    continue;
+
                 StringBuilder funcHeader = new StringBuilder();
 
                 funcHeader.Append(func.ReturnType);
@@ -124,24 +120,15 @@ namespace dcw
             }
             newHeaderCode.Append("\n");
 
-            File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());
-        }
-
-        private static FunctionDefinition[] parseFunctions(string code, string name)
-        {
-            MatchCollection functions = _functionRegex.Matches(code);
-            List<FunctionDefinition> funcDefs = new List<FunctionDefinition>();
-
-            Console.WriteLine(functions.Count + " functions in " + name + ":");
-            foreach(Match func in functions)
+            // Add the typedefs
+            foreach(string typedefStr in typedefDefs)
             {
-                // Parse the functions
-                Console.WriteLine(func.Value);
-                funcDefs.Add(new FunctionDefinition(func.Value));
-                Console.WriteLine(funcDefs[funcDefs.Count - 1].ToString());
+                newHeaderCode.Append(typedefStr);
+                newHeaderCode.Append("\n");
             }
+            newHeaderCode.Append("\n");
 
-            return funcDefs.ToArray();
+            File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());
         }
     }
 }
