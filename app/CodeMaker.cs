@@ -58,12 +58,12 @@ namespace dcw
                 FunctionDefinition[] funcDefs = Parser.parseFunctions(code, module.Name);
                 StructDefinition[] structDefs = Parser.parseStructs(code, module.Name);
 
-                saveNewHeader(module, funcDefs);
-                saveNewCCode(module, code);
+                saveNewHeader(module, funcDefs, structDefs);
+                saveNewCCode(module, code, structDefs);
             }
         }
 
-        private static void saveNewCCode(Module module, string sourceCode)
+        private static void saveNewCCode(Module module, string sourceCode, StructDefinition[] structDefs)
         {
             // Recreate source code
             StringBuilder newCCode = new StringBuilder();
@@ -85,13 +85,19 @@ namespace dcw
                 newCCode.Append(import);
                 newCCode.Append(".h>\n\n");
             }
+
+            foreach(StructDefinition structDef in structDefs)
+            {
+                if(module.Exports.Contains(structDef.Name))
+                    code = code.Replace(structDef.Source, "");
+            }
             
             newCCode.Append(code);
 
             File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
         }
 
-        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs)
+        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs, StructDefinition[] structDefs)
         {
             //if(module.Exports.Length < 1)
             //    return;
@@ -123,6 +129,12 @@ namespace dcw
                 newHeaderCode.Append("\n");
             }
             newHeaderCode.Append("\n");
+
+            foreach(StructDefinition structDef in structDefs)
+            {
+                if(module.Exports.Contains(structDef.Name))
+                    newHeaderCode.Append(structDef.Source);
+            }
 
             File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());
         }

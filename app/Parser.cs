@@ -72,9 +72,11 @@ namespace dcw
             // struct <ident> { <body> } ;
             for(int i = 0; i < code.Length; i++)
             {
+                int j = i;
                 (string, int) keyword = parsePhrase(code, "struct", ref i);
                 if(keyword.Item2 == -1)
                     continue;
+                int structStart = j;
 
                 (string, int) name = parseIdent(code, ref i);
                 if(name.Item2 == -1)
@@ -90,11 +92,11 @@ namespace dcw
 
                 StringBuilder structStr = new StringBuilder();
                 structStr.Append("struct ");
-                structStr.Append(name).Append(' ');
-                structStr.Append(body);
+                structStr.Append(name.Item1).Append(' ');
+                structStr.Append(body.Item1);
                 structStr.Append(';');
 
-                structDefs.Add(new StructDefinition(structStr.ToString()));
+                structDefs.Add(new StructDefinition(code.Substring(structStart, i - structStart), name.Item1));
             }
 
             Console.WriteLine("There are " + structDefs.Count + " struct definitions in " + moduleName);

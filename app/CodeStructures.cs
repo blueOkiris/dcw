@@ -199,19 +199,10 @@ namespace dcw
         public string Name;
         public string Source;
 
-        public StructDefinition(string source)
+        public StructDefinition(string source, string name)
         {
             Source = source;
-            
-            StringBuilder name = new StringBuilder();
-            int i = 0;
-            while(char.IsLetterOrDigit(source[i]) || source[i] == '_')
-            {
-                name.Append(source[i]);
-                i++;
-            }
-
-            Name = name.ToString();
+            Name = name;
         }
 
         public override string ToString()

@@ -12,7 +12,7 @@ struct lib_struct_s {
     char *str;
 };
 
-typedef struct lib_struct_t {
+typedef struct lib_struct_s {
     char *str;
 } lib_struct_t;
 
