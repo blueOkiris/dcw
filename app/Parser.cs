@@ -65,9 +65,39 @@ namespace dcw
             return funcDefs.ToArray();
         }
 
-        public static StructDefinition[] parseStructDefinitions(string code, string moduleName)
+        public static StructDefinition[] parseStructs(string code, string moduleName)
         {
             List<StructDefinition> structDefs = new List<StructDefinition>();
+            
+            // struct <ident> { <body> } ;
+            for(int i = 0; i < code.Length; i++)
+            {
+                (string, int) keyword = parsePhrase(code, "struct", ref i);
+                if(keyword.Item2 == -1)
+                    continue;
+
+                (string, int) name = parseIdent(code, ref i);
+                if(name.Item2 == -1)
+                    continue;
+
+                (string, int) body = parseCodeBlock(code, ref i);
+                if(body.Item2 == -1)
+                    continue;
+
+                (string, int) semi = parsePhrase(code, ";", ref i);
+                if(semi.Item2 == -1)
+                    continue;
+
+                StringBuilder structStr = new StringBuilder();
+                structStr.Append("struct ");
+                structStr.Append(name).Append(' ');
+                structStr.Append(body);
+                structStr.Append(';');
+
+                structDefs.Add(new StructDefinition(structStr.ToString()));
+            }
+
+            Console.WriteLine("There are " + structDefs.Count + " struct definitions in " + moduleName);
 
             return structDefs.ToArray();
         }

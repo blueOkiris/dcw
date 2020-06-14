@@ -32,6 +32,7 @@ namespace dcw
                     return ("", -1);
             }
             block.Append('}');
+            i++;
 
             return (block.ToString(), lBrace.Item2);
         }
