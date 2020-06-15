@@ -67,7 +67,7 @@ namespace dcw
             }
 
             // The three parts of the request
-            string compiler = _arguments[1];
+            string compiler = _arguments[0];
             List<string> sourceFiles = new List<string>();
             StringBuilder passThroughOptions = new StringBuilder();
 

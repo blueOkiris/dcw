@@ -12,7 +12,8 @@ namespace dcw
             SOURCE_NOT_FOUND =      -2,
             NOT_ONE_MODULE =        -3,
             FILE_IO_ERR =           -4,
-            MISSING_END_PARENTH =   -5
+            MISSING_END_PARENTH =   -5,
+            LINUX_ERROR =           -6,
         }
 
         public static Dictionary<Codes, string> Strings = new Dictionary<Codes, string>()
@@ -22,7 +23,8 @@ namespace dcw
             { Codes.SOURCE_NOT_FOUND,       "Error: Provided source file not found." },
             { Codes.NOT_ONE_MODULE,         "Error: Not exactly one module in file." },
             { Codes.FILE_IO_ERR,            "Error: Reading file." },
-            { Codes.MISSING_END_PARENTH,    "Error: Missing right parenthesis in definition." }
+            { Codes.MISSING_END_PARENTH,    "Error: Missing right parenthesis in definition." },
+            { Codes.LINUX_ERROR,            "Error: I programmed this poorly." }
         };
     }
 }
