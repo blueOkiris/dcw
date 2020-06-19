@@ -58,13 +58,19 @@ namespace dcw
                 FunctionDefinition[] funcDefs = Parser.parseFunctions(code, module.Name);
                 StructDefinition[] structDefs = Parser.parseStructs(code, module.Name);
                 MacroDefinition[] defs = Parser.parseMacros(code, module.Name);
+                TypedefDefinition[] typedefs = Parser.parseTypedefs(code, module.Name);
 
-                saveNewHeader(module, funcDefs, structDefs, defs);
-                saveNewCCode(module, code, structDefs, defs);
+                saveNewHeader(module, funcDefs, structDefs, defs, typedefs);
+                saveNewCCode(module, code, structDefs, defs, typedefs);
             }
         }
 
-        private static void saveNewCCode(Module module, string sourceCode, StructDefinition[] structDefs, MacroDefinition[] defs)
+        private static void saveNewCCode(
+            Module module,
+            string sourceCode, 
+            StructDefinition[] structDefs, 
+            MacroDefinition[] defs,
+            TypedefDefinition[] typedefs)
         {
             // Recreate source code
             StringBuilder newCCode = new StringBuilder();
@@ -98,13 +104,35 @@ namespace dcw
                 if(module.Exports.Contains(def.Name))
                     code = code.Replace(def.Source, "");
             }
+
+            foreach(TypedefDefinition def in typedefs)
+            {
+                if(module.Exports.Contains(def.Name))
+                    code = code.Replace(def.Source, "");
+                else
+                {
+                    StringBuilder realTypedef = new StringBuilder();
+
+                    realTypedef.Append("typedef ");
+                    realTypedef.Append(def.Body);
+                    realTypedef.Append(' ').Append(def.Name);
+                    realTypedef.Append(";\n");
+
+                    code = code.Replace(def.Source, realTypedef.ToString());
+                }
+            }
             
             newCCode.Append(code);
 
             File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
         }
 
-        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs, StructDefinition[] structDefs, MacroDefinition[] defs)
+        private static void saveNewHeader(
+            Module module,
+            FunctionDefinition[] funcDefs,
+            StructDefinition[] structDefs,
+            MacroDefinition[] defs,
+            TypedefDefinition[] typedefs)
         {
             //if(module.Exports.Length < 1)
             //    return;
@@ -140,14 +168,32 @@ namespace dcw
             foreach(StructDefinition structDef in structDefs)
             {
                 if(module.Exports.Contains(structDef.Name))
+                {
                     newHeaderCode.Append(structDef.Source);
+                    newHeaderCode.Append("\n");
+                }
             }
             newHeaderCode.Append("\n");
 
             foreach(MacroDefinition def in defs)
             {
                 if(module.Exports.Contains(def.Name))
+                {
                     newHeaderCode.Append(def.Body);
+                    newHeaderCode.Append("\n");
+                }
+            }
+            newHeaderCode.Append("\n");
+
+            foreach(TypedefDefinition def in typedefs)
+            {
+                if(module.Exports.Contains(def.Name))
+                {
+                    newHeaderCode.Append("typedef ");
+                    newHeaderCode.Append(def.Body);
+                    newHeaderCode.Append(' ').Append(def.Name);
+                    newHeaderCode.Append(";\n");
+                }
             }
             newHeaderCode.Append("\n");
 

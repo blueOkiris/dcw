@@ -148,5 +148,57 @@ namespace dcw
 
             return defs.ToArray();
         }
+
+        // Basically the same as parseMacros
+        public static TypedefDefinition[] parseTypedefs(string code, string moduleName)
+        {
+            // TODO: parse preprocessor code
+            List<TypedefDefinition> defs = new List<TypedefDefinition>();
+
+            /*
+             * macro ( <macro-code> , <ident> ) ;
+             * Here, we'll do macro ( <body> ) ;
+             * and throw an error if it fails
+             */
+            
+            for(int i = 0; i < code.Length; i++)
+            {
+                int typedefStart = i;
+
+                (string, int) keyword = parsePhrase(code, "typedef", ref i);
+                if(keyword.Item2 == -1)
+                    continue;
+
+                (string, int) lParenth = parsePhrase(code, "(", ref i);
+                if(lParenth.Item2 == -1)
+                    continue;
+
+                (string, int) name = parseIdent(code, ref i);
+                if(name.Item2 == -1)
+                    continue;
+
+                (string, int) comma = parsePhrase(code, ",", ref i);
+                if(lParenth.Item2 == -1)
+                    continue;
+
+                (string, int) body = parseMacroBody(code, ref i);
+                if(body.Item2 == -1)
+                    continue;
+
+                (string, int) rParenth = parsePhrase(code, ")", ref i);
+                if(rParenth.Item2 == -1)
+                    continue;
+
+                (string, int) semi = parsePhrase(code, ";", ref i);
+                if(semi.Item2 == -1)
+                    continue;
+                
+                defs.Add(new TypedefDefinition(code.Substring(typedefStart, i - typedefStart).Trim(), body.Item1, name.Item1));
+            }
+
+            Console.WriteLine("There are " + defs.Count + " macro definitions in " + moduleName);
+
+            return defs.ToArray();
+        }
     }
 }

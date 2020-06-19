@@ -230,4 +230,23 @@ namespace dcw
             return "Macro { Name: " + Name + ", Body: " + Body + " }";
         }
     }
+
+    struct TypedefDefinition
+    {
+        public string Name;
+        public string Source;
+        public string Body;
+
+        public TypedefDefinition(string source, string body, string name)
+        {
+            Source = source;
+            Body = body;
+            Name = name;
+        }
+
+        public override string ToString()
+        {
+            return "Typedef { Name: " + Name + ", Body: " + Body + " }";
+        }
+    }
 }
