@@ -21,12 +21,12 @@ namespace dcw
             List<string> imports = new List<string>();
 
             Regex moduleDef = new Regex(
-                @"module\s*\(\s*[A-Za-z0-9_]+\s*(,\s*[A-Za-z0-9_]+\s*)*\s*\)",
+                @"module\s*\(\s*[A-Za-z0-9_]+\s*(,\s*[A-Za-z0-9_]+\s*)*\s*\)\s*;",
                 RegexOptions.Compiled
             );
 
             Regex importDef = new Regex(
-                @"import\s*\(\s*[A-Za-z0-9_]+\s*\)",
+                @"import\s*\(\s*[A-Za-z0-9_]+\s*\)\s*;",
                 RegexOptions.Compiled
             );
 

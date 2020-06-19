@@ -10,11 +10,11 @@ namespace dcw
     class NewCodeMaker
     {
         private static Regex _moduleDef = new Regex(
-            @"module\s*\(\s*[A-Za-z0-9_]+\s*(,\s*[A-Za-z0-9_]+\s*)*\s*\)",
+            @"module\s*\(\s*[A-Za-z0-9_]+\s*(,\s*[A-Za-z0-9_]+\s*)*\s*\)\s*;",
             RegexOptions.Compiled
         );
         private static Regex _importRegex = new Regex(
-            @"import\s*\(\s*[A-Za-z0-9_]+\s*\)",
+            @"import\s*\(\s*[A-Za-z0-9_]+\s*\)\s*;",
             RegexOptions.Compiled
         );
         private static Regex _lineCommentRegex = new Regex(

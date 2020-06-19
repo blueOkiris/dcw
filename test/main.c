@@ -1,7 +1,7 @@
-module(main)
+module(main);
 
-import(lib)
-import(stdio)
+import(lib);
+import(stdio);
 
 int main(int argc, char **args) {
     // Test functions
