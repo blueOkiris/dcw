@@ -57,7 +57,7 @@ namespace dcw
 
                 FunctionDefinition[] funcDefs = Parser.parseFunctions(code, module.Name);
                 StructDefinition[] structDefs = Parser.parseStructs(code, module.Name);
-                MacroDefinition[] defs = Parser.parseDefs(code, module.Name);
+                MacroDefinition[] defs = Parser.parseMacros(code, module.Name);
 
                 saveNewHeader(module, funcDefs, structDefs, defs);
                 saveNewCCode(module, code, structDefs, defs);

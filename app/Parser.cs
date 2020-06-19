@@ -104,7 +104,7 @@ namespace dcw
             return structDefs.ToArray();
         }
 
-        public static MacroDefinition[] parseDefs(string code, string moduleName)
+        public static MacroDefinition[] parseMacros(string code, string moduleName)
         {
             // TODO: parse preprocessor code
             List<MacroDefinition> defs = new List<MacroDefinition>();
