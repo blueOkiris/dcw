@@ -108,6 +108,8 @@ namespace dcw
             {
                 if(module.Exports.Contains(def.Name))
                     code = code.Replace(def.Source, "");
+                else
+                    code = code.Replace(def.Source, def.Body);
             }
 
             foreach(TypedefDefinition def in typedefs)
