@@ -8,14 +8,28 @@ void lib_print(char *str1, char *str2) {
     if(1) { }
 }
 
+void lib_print_unexported() {
+
+}
+
 struct lib_struct_s {
     char *str;
 };
 
-typedef struct lib_struct_s {
+struct lib_struct_unexported_s {
+    char *str;
+};
+
+typedef struct lib_struct_t1_s {
     char *str;
 } lib_struct_t;
 
-char *g_lib_str = "Hello, world!\n";
+typedef struct lib_struct_t2_s {
+    char *str;
+} lib_struct_unexported_t;
 
-#define LIB_DEFINE "Hello, world!\n"
+char *g_lib_str = "Hello, world!\n";
+char *g_lib_str_unexported = "foo";
+
+#define LIB_DEFINE          "Hello, world!\n"
+#define LIB_DEF_UNEXPORTED  69420
