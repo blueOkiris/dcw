@@ -17,3 +17,5 @@ The 'options' would be aditional C compiler options in case of 3rd party headers
 The gist of what I'm doing is captured in the UML below:
 
 ![project uml](./images/design1.png)
+
+I'll probably add a more complete UML diagram as the project grows
