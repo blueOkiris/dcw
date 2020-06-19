@@ -104,12 +104,12 @@ namespace dcw
             return structDefs.ToArray();
         }
 
-        public static DefinitionDefinition[] parseDefs(string code, string moduleName)
+        public static MacroDefinition[] parseDefs(string code, string moduleName)
         {
             // TODO: parse preprocessor code
-            List<DefinitionDefinition> defs = new List<DefinitionDefinition>();
+            List<MacroDefinition> defs = new List<MacroDefinition>();
 
-            
+
 
             return defs.ToArray();
         }

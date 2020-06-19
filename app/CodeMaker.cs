@@ -57,14 +57,14 @@ namespace dcw
 
                 FunctionDefinition[] funcDefs = Parser.parseFunctions(code, module.Name);
                 StructDefinition[] structDefs = Parser.parseStructs(code, module.Name);
-                DefinitionDefinition[] defs = Parser.parseDefs(code, module.Name);
+                MacroDefinition[] defs = Parser.parseDefs(code, module.Name);
 
                 saveNewHeader(module, funcDefs, structDefs, defs);
                 saveNewCCode(module, code, structDefs, defs);
             }
         }
 
-        private static void saveNewCCode(Module module, string sourceCode, StructDefinition[] structDefs, DefinitionDefinition[] defs)
+        private static void saveNewCCode(Module module, string sourceCode, StructDefinition[] structDefs, MacroDefinition[] defs)
         {
             // Recreate source code
             StringBuilder newCCode = new StringBuilder();
@@ -93,7 +93,7 @@ namespace dcw
                     code = code.Replace(structDef.Source, "");
             }
 
-            foreach(DefinitionDefinition def in defs)
+            foreach(MacroDefinition def in defs)
             {
                 if(module.Exports.Contains(def.Name))
                     code = code.Replace(def.Source, "");
@@ -104,7 +104,7 @@ namespace dcw
             File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
         }
 
-        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs, StructDefinition[] structDefs, DefinitionDefinition[] defs)
+        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs, StructDefinition[] structDefs, MacroDefinition[] defs)
         {
             //if(module.Exports.Length < 1)
             //    return;
@@ -143,7 +143,7 @@ namespace dcw
                     newHeaderCode.Append(structDef.Source);
             }
 
-            foreach(DefinitionDefinition def in defs)
+            foreach(MacroDefinition def in defs)
             {
                 if(module.Exports.Contains(def.Name))
                     newHeaderCode.Append(def.Source);

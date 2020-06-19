@@ -212,12 +212,12 @@ namespace dcw
         }
     }
 
-    struct DefinitionDefinition
+    struct MacroDefinition
     {
         public string Name;
         public string Source;
 
-        public DefinitionDefinition(string source, string name)
+        public MacroDefinition(string source, string name)
         {
             Source = source;
             Name = name;
