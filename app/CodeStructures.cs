@@ -225,7 +225,7 @@ namespace dcw
 
         public override string ToString()
         {
-            return "Definition { Name: " + Name + ", Source: " + Source + " }";
+            return "Macro { Name: " + Name + ", Source: " + Source + " }";
         }
     }
 }
