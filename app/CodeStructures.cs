@@ -194,6 +194,7 @@ namespace dcw
         }
     }
 
+    // These two share code, but it's small, so don't alter them
     struct StructDefinition
     {
         public string Name;
@@ -208,6 +209,23 @@ namespace dcw
         public override string ToString()
         {
             return "Struct { Name: " + Name + ", Source: " + Source + " }";
+        }
+    }
+
+    struct DefinitionDefinition
+    {
+        public string Name;
+        public string Source;
+
+        public DefinitionDefinition(string source, string name)
+        {
+            Source = source;
+            Name = name;
+        }
+
+        public override string ToString()
+        {
+            return "Definition { Name: " + Name + ", Source: " + Source + " }";
         }
     }
 }

@@ -57,13 +57,14 @@ namespace dcw
 
                 FunctionDefinition[] funcDefs = Parser.parseFunctions(code, module.Name);
                 StructDefinition[] structDefs = Parser.parseStructs(code, module.Name);
+                DefinitionDefinition[] defs = Parser.parseDefs(code, module.Name);
 
-                saveNewHeader(module, funcDefs, structDefs);
-                saveNewCCode(module, code, structDefs);
+                saveNewHeader(module, funcDefs, structDefs, defs);
+                saveNewCCode(module, code, structDefs, defs);
             }
         }
 
-        private static void saveNewCCode(Module module, string sourceCode, StructDefinition[] structDefs)
+        private static void saveNewCCode(Module module, string sourceCode, StructDefinition[] structDefs, DefinitionDefinition[] defs)
         {
             // Recreate source code
             StringBuilder newCCode = new StringBuilder();
@@ -91,13 +92,19 @@ namespace dcw
                 if(module.Exports.Contains(structDef.Name))
                     code = code.Replace(structDef.Source, "");
             }
+
+            foreach(DefinitionDefinition def in defs)
+            {
+                if(module.Exports.Contains(def.Name))
+                    code = code.Replace(def.Source, "");
+            }
             
             newCCode.Append(code);
 
             File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
         }
 
-        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs, StructDefinition[] structDefs)
+        private static void saveNewHeader(Module module, FunctionDefinition[] funcDefs, StructDefinition[] structDefs, DefinitionDefinition[] defs)
         {
             //if(module.Exports.Length < 1)
             //    return;
@@ -134,6 +141,12 @@ namespace dcw
             {
                 if(module.Exports.Contains(structDef.Name))
                     newHeaderCode.Append(structDef.Source);
+            }
+
+            foreach(DefinitionDefinition def in defs)
+            {
+                if(module.Exports.Contains(def.Name))
+                    newHeaderCode.Append(def.Source);
             }
 
             File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());
