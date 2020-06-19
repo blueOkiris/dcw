@@ -33,16 +33,11 @@ namespace dcw
             return moduleList.ToArray();
         }
 
-        public static void GenerateNewCode(WrapRequest request)
+        public static ((string, string), (string, string))[] GenerateNewCode(WrapRequest request)
         {
             Module[] modules = getModules(request.SourceFiles);
-
-            // Files to output
-            if(!Directory.Exists("headers"))
-                Directory.CreateDirectory("headers");
-            if(!Directory.Exists("obj"))
-                Directory.CreateDirectory("obj");
-
+            
+            List<((string, string), (string, string))> files = new List<((string, string), (string, string))>();
             foreach(Module module in modules)
             {
                 Console.WriteLine(module.ToString());
@@ -65,18 +60,23 @@ namespace dcw
                                         code, module, 
                                         funcDefs, structDefs, defs, typedefs);
 
-                saveNewHeader(module, funcDefs, structDefs, defs, typedefs, globalVars);
-                saveNewCCode(module, code, structDefs, defs, typedefs);
+                (string, string) header = saveNewHeader(module, funcDefs, structDefs, defs, typedefs, globalVars);
+                (string, string) source = saveNewCCode(module, code, structDefs, defs, typedefs);
+
+                files.Add((header, source));
             }
+            
+            return files.ToArray();
         }
 
-        private static void saveNewCCode(
+        private static (string, string) saveNewCCode(
             Module module,
             string sourceCode, 
             StructDefinition[] structDefs, 
             MacroDefinition[] defs,
             TypedefDefinition[] typedefs)
         {
+
             // Recreate source code
             StringBuilder newCCode = new StringBuilder();
             string code = sourceCode;
@@ -129,10 +129,11 @@ namespace dcw
             
             newCCode.Append(code);
 
-            File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
+            //File.WriteAllText("obj/" + module.Name + ".c", newCCode.ToString());
+            return (module.Name + ".c", newCCode.ToString());
         }
 
-        private static void saveNewHeader(
+        private static (string, string) saveNewHeader(
             Module module,
             FunctionDefinition[] funcDefs,
             StructDefinition[] structDefs,
@@ -207,7 +208,8 @@ namespace dcw
                 newHeaderCode.Append("extern ").Append(globalVar).Append(";\n");
             newHeaderCode.Append("\n");
 
-            File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());
+            //File.WriteAllText("temp/headers/" + module.Name + ".h", newHeaderCode.ToString());
+            return (module.Name + ".h", newHeaderCode.ToString());
         }
     }
 }

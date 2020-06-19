@@ -13,8 +13,7 @@ namespace dcw
             WrapRequest wrapRequest = argCompiler.GetRequest();
             Console.WriteLine("Application Wrap Request: {0}", wrapRequest.ToString());
             
-            NewCodeMaker.GenerateNewCode(wrapRequest);
-            Builder.BuildObjects(wrapRequest);
+            Builder.BuildObjects(wrapRequest, NewCodeMaker.GenerateNewCode(wrapRequest));
         }
     }
 }
