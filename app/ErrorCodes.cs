@@ -14,6 +14,7 @@ namespace dcw
             FILE_IO_ERR =           -4,
             MISSING_END_PARENTH =   -5,
             LINUX_ERROR =           -6,
+            MISSING_END_BRACKET =   -7,
         }
 
         public static Dictionary<Codes, string> Strings = new Dictionary<Codes, string>()

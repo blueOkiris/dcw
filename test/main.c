@@ -12,9 +12,9 @@ int main(int argc, char **args) {
     strct1.str = "Hello";
 
     lib_struct_t strct2;
-    strct2.str = ", world!\n";
+    strct2.str = "world";
 
-    printf("%s, %s", strct1.str, strct2.str);
+    printf("%s, %s!\n", strct1.str, strct2.str);
 
     // Test exported variables
     printf("%s", g_lib_str);

@@ -1,11 +1,70 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace dcw
 {
     partial class Parser
     {
+        public static string[] parseGlobals(
+            string code, Module module, 
+            FunctionDefinition[] funcDefs, 
+            StructDefinition[] structDefs, 
+            MacroDefinition[] defs, 
+            TypedefDefinition[] typedefs)
+        {
+            List<string> globals = new List<string>();
+
+            for(int i = 0; i < code.Length; i++)
+            {
+                // We only want global scope!
+                (string, int) lbrace = parsePhrase(code, "{", ref i);
+                if(lbrace.Item2 != -1)
+                {
+                    int braceLevel = 0;
+                    while(code[i] != '}' && braceLevel == 0)
+                    {
+                        if(code[i] == '{')
+                            braceLevel++;
+                        if(code[i] == '}')
+                            braceLevel--;
+
+                        i++;
+                        if(i >= code.Length)
+                        {
+                            Console.WriteLine(ErrorCodes.Strings[ErrorCodes.Codes.MISSING_END_BRACKET]);
+                            Environment.Exit((int) ErrorCodes.Codes.MISSING_END_BRACKET);
+                        }
+                    }
+                    i++;
+                }
+
+                (string, int) typeStr = parseType(code, ref i);
+                if(typeStr.Item2 == -1)
+                    continue;
+                
+                (string, int) name = parseIdent(code, ref i);
+                if(name.Item2 == -1)
+                    continue;
+
+                if(module.Exports.Contains(name.Item1)
+                        && !funcDefs.ToList().Select(
+                            (funcDef) => funcDef.Name).ToArray().Contains(name.Item1)
+                        && !structDefs.ToList().Select(
+                            (structDef) => structDef.Name).ToArray().Contains(name.Item1)
+                        && !defs.ToList().Select(
+                            (def) => def.Name).ToArray().Contains(name.Item1)
+                        && !typedefs.ToList().Select(
+                            (def) => def.Name).ToArray().Contains(name.Item1))
+                    globals.Add(typeStr.Item1 + " " + name.Item1);
+            }
+
+            Console.WriteLine("There are " + globals.Count + " exported global variables in " + module.Name);
+
+            return globals.ToArray();
+        }
+
         public static FunctionDefinition[] parseFunctions(string code, string moduleName)
         {
             List<FunctionDefinition> funcDefs = new List<FunctionDefinition>();

@@ -60,7 +60,12 @@ namespace dcw
                 MacroDefinition[] defs = Parser.parseMacros(code, module.Name);
                 TypedefDefinition[] typedefs = Parser.parseTypedefs(code, module.Name);
 
-                saveNewHeader(module, funcDefs, structDefs, defs, typedefs);
+                // THIS MUST BE PARSED LAST!!!
+                string[] globalVars = Parser.parseGlobals(
+                                        code, module, 
+                                        funcDefs, structDefs, defs, typedefs);
+
+                saveNewHeader(module, funcDefs, structDefs, defs, typedefs, globalVars);
                 saveNewCCode(module, code, structDefs, defs, typedefs);
             }
         }
@@ -132,7 +137,8 @@ namespace dcw
             FunctionDefinition[] funcDefs,
             StructDefinition[] structDefs,
             MacroDefinition[] defs,
-            TypedefDefinition[] typedefs)
+            TypedefDefinition[] typedefs,
+            string[] globalVars)
         {
             //if(module.Exports.Length < 1)
             //    return;
@@ -195,6 +201,10 @@ namespace dcw
                     newHeaderCode.Append(";\n");
                 }
             }
+            newHeaderCode.Append("\n");
+
+            foreach(string globalVar in globalVars)
+                newHeaderCode.Append("extern ").Append(globalVar).Append(";\n");
             newHeaderCode.Append("\n");
 
             File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());

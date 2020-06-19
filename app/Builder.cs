@@ -25,6 +25,8 @@ namespace dcw
                     args.Append(request.Compiler);
                     args.Append(" -Iheaders -c ");
                     args.Append(fileName).Append(' ');
+                    args.Append(" -o obj/");
+                    args.Append(Path.GetFileNameWithoutExtension(fileName)).Append(".o ");
                     args.Append(request.PassThroughOptions);
                     args.Append('"');
 
