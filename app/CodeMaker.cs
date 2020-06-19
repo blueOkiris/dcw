@@ -142,12 +142,14 @@ namespace dcw
                 if(module.Exports.Contains(structDef.Name))
                     newHeaderCode.Append(structDef.Source);
             }
+            newHeaderCode.Append("\n");
 
             foreach(MacroDefinition def in defs)
             {
                 if(module.Exports.Contains(def.Name))
-                    newHeaderCode.Append(def.Source);
+                    newHeaderCode.Append(def.Body);
             }
+            newHeaderCode.Append("\n");
 
             File.WriteAllText("headers/" + module.Name + ".h", newHeaderCode.ToString());
         }

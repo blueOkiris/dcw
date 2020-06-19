@@ -6,6 +6,32 @@ namespace dcw
 {
     partial class Parser
     {
+        private static (string, int) parseMacroBody(string code, ref int i)
+        {
+            int start = i;
+
+            if(!passWhiteSpace(code, ref i))
+                return ("", -1);
+
+            StringBuilder block = new StringBuilder();
+            int parenLevel = 0;
+            while(code[i] != ')' && parenLevel == 0)
+            {
+                block.Append(code[i]);
+                
+                if(code[i] == '(')
+                    parenLevel++;
+                if(code[i] == ')')
+                    parenLevel--;
+
+                i++;
+                if(i >= code.Length)
+                    return ("", -1);
+            }
+
+            return (block.ToString(), start);
+        }
+
         private static (string, int) parseCodeBlock(string code, ref int i)
         {
             if(!passWhiteSpace(code, ref i))

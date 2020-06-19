@@ -90,12 +90,6 @@ namespace dcw
                 if(semi.Item2 == -1)
                     continue;
 
-                StringBuilder structStr = new StringBuilder();
-                structStr.Append("struct ");
-                structStr.Append(name.Item1).Append(' ');
-                structStr.Append(body.Item1);
-                structStr.Append(';');
-
                 structDefs.Add(new StructDefinition(code.Substring(structStart, i - structStart), name.Item1));
             }
 
@@ -109,7 +103,48 @@ namespace dcw
             // TODO: parse preprocessor code
             List<MacroDefinition> defs = new List<MacroDefinition>();
 
+            /*
+             * macro ( <macro-code> , <ident> ) ;
+             * Here, we'll do macro ( <body> ) ;
+             * and throw an error if it fails
+             */
+            
+            for(int i = 0; i < code.Length; i++)
+            {
+                int macroStart = i;
 
+                (string, int) keyword = parsePhrase(code, "macro", ref i);
+                if(keyword.Item2 == -1)
+                    continue;
+
+                (string, int) lParenth = parsePhrase(code, "(", ref i);
+                if(lParenth.Item2 == -1)
+                    continue;
+
+                (string, int) name = parseIdent(code, ref i);
+                if(name.Item2 == -1)
+                    continue;
+
+                (string, int) comma = parsePhrase(code, ",", ref i);
+                if(lParenth.Item2 == -1)
+                    continue;
+
+                (string, int) body = parseMacroBody(code, ref i);
+                if(body.Item2 == -1)
+                    continue;
+
+                (string, int) rParenth = parsePhrase(code, ")", ref i);
+                if(rParenth.Item2 == -1)
+                    continue;
+
+                (string, int) semi = parsePhrase(code, ";", ref i);
+                if(semi.Item2 == -1)
+                    continue;
+                
+                defs.Add(new MacroDefinition(code.Substring(macroStart, i - macroStart), body.Item1, name.Item1));
+            }
+
+            Console.WriteLine("There are " + defs.Count + " macro definitions in " + moduleName);
 
             return defs.ToArray();
         }

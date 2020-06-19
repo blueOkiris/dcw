@@ -21,25 +21,25 @@ struct lib_struct_unexported_s {
 };
 
 typedef(
+    lib_struct_t,
     struct lib_struct_t1_s {
         char *str;
-    },
-    lib_struct_t
+    }
 );
 
 typedef(
+    lib_struct_unexported_t,
     struct lib_struct_t2_s {
         char *str;
-    },
-    lib_struct_unexported_t
+    }
 );
 
 char *g_lib_str = "Hello, world!\n";
 char *g_lib_str_unexported = "foo";
 
 macro(
-    #define LIB_DEFINE "Hello, world!\n",
-    def1
+    def1,
+    #define LIB_DEFINE "Hello, world!\n"
 );
 
 #define LIB_DEF_UNEXPORTED 69420

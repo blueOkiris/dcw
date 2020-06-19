@@ -73,7 +73,7 @@ namespace dcw
                 name = moduleString.Substring(parenInd + 1, firstComma - parenInd - 1).Trim();
 
                 // Get the export names
-                string[] names = moduleString.Substring(firstComma + 1).Replace(")", " ").Trim().Split(",");
+                string[] names = moduleString.Substring(firstComma + 1).Replace(")", " ").Replace(";", " ").Trim().Split(",");
                 foreach(string n in names)
                     exports.Add(n.Trim());
             }
@@ -216,16 +216,18 @@ namespace dcw
     {
         public string Name;
         public string Source;
+        public string Body;
 
-        public MacroDefinition(string source, string name)
+        public MacroDefinition(string source, string body, string name)
         {
             Source = source;
+            Body = body;
             Name = name;
         }
 
         public override string ToString()
         {
-            return "Macro { Name: " + Name + ", Source: " + Source + " }";
+            return "Macro { Name: " + Name + ", Body: " + Body + " }";
         }
     }
 }
