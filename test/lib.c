@@ -43,3 +43,8 @@ macro(
 );
 
 #define LIB_DEF_UNEXPORTED 69420
+
+macro(
+    def2,
+    #define LIB_DEF_UNEXPORTED2 "Electric Boogaloo"
+);
