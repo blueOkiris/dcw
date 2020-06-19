@@ -3,7 +3,6 @@ app/obj/
 app/bin/
 
 test/test
-test/headers
 test/obj
 
 .vscode/
